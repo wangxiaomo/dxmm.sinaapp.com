@@ -8,6 +8,8 @@
   <meta name="author" content="xiaomo(wxm4ever@gmail.com)">
 
   <!-- Le styles -->
+  <link ref="Shorcut Icon" href="static/fav.ico" />
+  <link ref="Bookmark" href="static/fav.ico" />
   <link href="static/bootstrap/css/bootstrap.css" rel="stylesheet">
   <link href="static/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
   <style type="text/css">
@@ -71,7 +73,9 @@
             <tbody>
 
             {% for s in status %}
-              <tr><td> Text: {{ s[1] }} Time: {{ s[3] }} </td></tr>
+              <tr><td> 
+              Text: {{ s[1] }} Time: {{ s[3] }} 
+              </td></tr>
             {% endfor %}
 
             <tr><td><center>显示更多</center></td></tr>
