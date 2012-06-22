@@ -78,28 +78,36 @@ def callback():
 
 @app.route("/post", methods=['GET','POST'])
 def post():
-    """ 发布秘密 && 评论 """
+    """ 发布秘密 """
     err = 0
     params = request.values
-    is_comment = int(params.get('is_comment'))
 
-    if is_comment == 0:
-        # 添加秘密
-        status = params.get('status')
-        uid = session['uid']
-        ret = add_status(uid, status)
-        if ret == True:
-            msg = "添加成功!"
-        else:
-            err = 1
-            msg = "*** Exception: %s" % ret 
-    elif is_comment == 1:
-        # 添加评论
-        pass
+    # 添加秘密
+    status = params.get('status')
+    uid = session['uid']
+    ret = add_status(uid, status)
+    if ret == True:
+        msg = "添加成功!"
     else:
-        # 未识别命令
         err = 1
-        msg = "未识别的命令! COMMAND: %d" % is_comment
+        msg = "*** Exception: %s" % ret 
+    return jsonify(err=err,msg=msg)
+
+@app.route("/status/<int:status_id>", methods=['GET', 'POST'])
+def post_comment(status_id):
+    """ 发布评论 """
+    err = 0
+    params = request.values
+
+    # 添加评论
+    comment = params.get('comment')
+    uid = session['uid']
+    ret = add_comment(status_id, uid, comment)
+    if ret == True:
+        msg = "评论成功!"
+    else:
+        err = 1
+        msg = "*** Exception: %s" % ret 
     return jsonify(err=err,msg=msg)
 
 @app.route("/logout")
@@ -154,6 +162,17 @@ def add_status(uid, status):
         time = get_time(datetime.now())
         sql = "INSERT INTO status(status,uid,pub_time) VALUES('%s', %d, '%s')" \
                 % (quote_sql(status), int(uid), time)
+        db.update(sql)
+        return True
+    except Exception as e:
+        return str(e)
+
+def add_comment(status_id, uid, comment):
+    try:
+        db = MySQL()
+        time = get_time(datetime.now())
+        sql = "INSERT INTO comments(post_id, uid, comment, pub_time) VALUES(%d, %d, '%s', '%s')" \
+                % (status_id, uid, quote_sql(comment), time)
         db.update(sql)
         return True
     except Exception as e:

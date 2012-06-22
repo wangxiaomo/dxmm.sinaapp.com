@@ -8,8 +8,8 @@
   <meta name="author" content="xiaomo(wxm4ever@gmail.com)">
 
   <!-- Le styles -->
-  <link ref="Shorcut Icon" href="static/fav.ico" />
-  <link ref="Bookmark" href="static/fav.ico" />
+  <link ref="shorcut icon" href="static/fav.ico" />
+  <link ref="bookmark" href="static/fav.ico" />
   <link href="static/bootstrap/css/bootstrap.css" rel="stylesheet">
   <link href="static/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
   <style type="text/css">
@@ -75,6 +75,17 @@
             {% for s in status %}
               <tr><td> 
               Text: {{ s[1] }} Time: {{ s[3] }} 
+              <a class="show-comments" style="float:right">回应</a>
+              <div class="comments">
+                <ul class="unstyled" style="margin-left:40px;">
+                  <li>1</li>
+                  <li>2</li>
+                </ul>
+                <input type="text" class="comment">
+                <input type="hidden" name="status_id" id="status_id" value="{{ s[0] }}" />
+                <button class="post-comment">提交回应</button>
+                </div>
+              </div>
               </td></tr>
             {% endfor %}
 
@@ -110,6 +121,8 @@ $(document).ready(function(){
   var motions = {'高兴':'btn-danger', '寂寞':'btn-info', '思念':'btn-success', '痛苦':'btn-inverse'};
   var motion_txt;
   var page = 0;
+  $(".comments").hide(); //隐藏所有评论
+
   /* 心情 */
   $("a.motion").click(function(){
     motion_txt = $(this).text();
@@ -119,7 +132,8 @@ $(document).ready(function(){
   $(".post-status").click(function(){
     var status = $(".status").val();
     status = motion_txt+'#'+status;
-    $.post('./post', {'is_comment':0, 'status':status} ,function(data){
+    alert(status);
+    $.post('./post', {'status':status} ,function(data){
       var err = data.err;
       var msg = data.msg;
 
@@ -130,6 +144,28 @@ $(document).ready(function(){
         var tbody = $("tbody").html();
         tbody = "<tr><td><center>有新秘密。点击刷新!</center></td></tr>" + tbody;
         $("tbody").html(tbody);
+      }
+    });
+  });
+  /* 显示评论 */
+  $("a.show-comments").click(function(){
+    $(this).next().toggle();
+  });
+  /* 提交评论 */
+  $(".post-comment").click(function(){
+    var comment_elem = $(this).prev().prev();
+    var id = $(this).prev().attr('value');
+    var url = './status/' + id;
+    $.post(url, {'comment':comment_elem.val()}, function(data){
+      if(data.err){
+        alert(data.msg);
+      }else{
+        //评论成功.
+        var ul_elem = comment_elem.prev();
+        var ul_html = ul_elem.html();
+        ul_html = ul_html + "<li>"+comment_elem.val()+"</li>";
+        ul_elem.html(ul_html);
+        comment_elem.val('');
       }
     });
   });
