@@ -115,9 +115,18 @@ $(document).ready(function(){
   $(".post-status").click(function(){
     var status = $(".status").val();
     status = motion_txt+'#'+status;
-    alert(status);
     $.post('./post', {'is_comment':0, 'status':status} ,function(data){
-      alert(data.msg);
+      var err = data.err;
+      var msg = data.msg;
+
+      if(err){
+        alert(msg);
+      }else{
+        //添加到 tbody 首
+        var tbody = $("tbody").html();
+        tbody = "<tr><td><center>有新秘密。点击刷新!</center></td></tr>" + tbody;
+        $("tbody").html(tbody);
+      }
     });
   });
 });
