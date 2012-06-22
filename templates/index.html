@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>大学秘密</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="http://github.com/wangxiaomo/py-weibo-oauth2template">
+  <meta name="author" content="xiaomo(wxm4ever@gmail.com)">
+
+  <!-- Le styles -->
+  <link href="static/bootstrap/css/bootstrap.css" rel="stylesheet">
+  <link href="static/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+  <style type="text/css">
+  body {padding-top:60px; padding-bottom:40px;}
+  </style>
+</head>
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="navbar-inner">
+    <div class="container">
+      <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </a>
+      <a class="brand" href="#">大学秘密</a>
+      <div class="nav-collapse">
+        <ul class="nav">
+          <li class="active"><a href="#">Home</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+        <ul class="nav pull-right">
+          <li><a href="logout">Logout</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+<!-- some content -->
+  <div class="row">
+    <div class="span8">
+      <div class="container">
+        <div>
+          <h1>发布秘密</h1>
+           <div class="control-group">
+            <textarea class="input-xlarge status" id="textarea" rows="3" style="width:60%" placeholder="说点什么吧..."></textarea>
+            <div class="row">
+            <div class="span1 btn-group">
+              <button class="motion btn dropdown-toggle" data-toggle="dropdown">
+                 心情
+                 <span class="caret"></span>
+              </button>
+              <ul class="dropdown-menu">
+                <li><a class="motion" href="#">高兴</a></li>
+                <li><a class="motion" href="#">寂寞</a></li>
+                <li><a class="motion" href="#">思念</a></li>
+                <li><a class="motion" href="#">痛苦</a></li>
+              </ul>
+            </div>
+            <div class="span6"><button class="btn btn-inverse post-status" style="width:120px;float:right;margin-right:-44px;">我说</button></div>
+            </div>
+           </div>
+        </div>
+        <div>
+          <h1>显示秘密</h1>
+          <table class="show-status table table-bordered table-striped" style="width:61%">
+            <tbody>
+
+            {% for s in status %}
+              <tr><td> Text: {{ s[1] }} Time: {{ s[3] }} </td></tr>
+            {% endfor %}
+
+            <tr><td><center>显示更多</center></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="span4">
+      <h1>Features</h1>
+      <ul class="nav nav-tabs nav-stacked">
+        <li><a href="#">评论最多</a></li>
+        <li><a href="#">转发最多</a></li>
+        <li><a href="#">本周最佳</a></li>
+        <li><a href="#">本月最佳</a></li>
+        <li><a href="#">秘密分析</a></li>
+      </ul>
+    </div>
+  </div>
+
+<hr />
+<footer><center>
+&copy;SAE Python + Flask + xiaomo(wxm4ever@gmail.com). <a href="https://github.com/wangxiaomo/py-weibo-oauth2template/fork_select" target="_blank">Fork me</a>
+</center></footer>
+</div>
+
+
+<script src="static/bootstrap/js/jquery.js"></script>
+<script src="static/bootstrap/js/bootstrap.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+  var motions = {'高兴':'btn-danger', '寂寞':'btn-info', '思念':'btn-success', '痛苦':'btn-inverse'};
+  var motion_txt;
+  var page = 0;
+  /* 心情 */
+  $("a.motion").click(function(){
+    motion_txt = $(this).text();
+    $(".dropdown-toggle").removeClass().addClass('btn dropdown-toggle').addClass(motions[motion_txt]).html(motion_txt+" <span class=\"caret\"></span>");
+  });
+  /* 发布秘密 */
+  $(".post-status").click(function(){
+    var status = $(".status").val();
+    status = motion_txt+'#'+status;
+    alert(status);
+    $.post('./post', {'is_comment':0, 'status':status} ,function(data){
+      alert(data.msg);
+    });
+  });
+});
+</script>
+</body>
+</html>
