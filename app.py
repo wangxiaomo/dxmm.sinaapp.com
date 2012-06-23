@@ -48,8 +48,16 @@ def index():
         return redirect(auth_url)
     else:
         #TODO:不确定新浪OAuth2的access_key多会过期．
-        status = show_status()
-        return render_template('index.html', status=status)
+        ret = []
+        status = list(show_status())
+        for s in status:
+            tmp = [] 
+            tmp.extend(s)
+            status_id = s[0]
+            comments = get_status_comments(status_id)
+            tmp.append(comments)
+            ret.append(tmp)
+        return render_template('index.html', status=ret)
 
 @app.route("/callback")
 def callback():
@@ -175,6 +183,15 @@ def add_comment(status_id, uid, comment):
                 % (status_id, uid, quote_sql(comment), time)
         db.update(sql)
         return True
+    except Exception as e:
+        return str(e)
+
+def get_status_comments(status_id):
+    try:
+        db = MySQL()
+        sql = "SELECT * FROM comments WHERE post_id=%d ORDER BY pub_time" % status_id
+        ret = db.query(sql)
+        return ret 
     except Exception as e:
         return str(e)
 

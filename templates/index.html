@@ -78,8 +78,9 @@
               <a class="show-comments" style="float:right">回应</a>
               <div class="comments">
                 <ul class="unstyled" style="margin-left:40px;">
-                  <li>1</li>
-                  <li>2</li>
+                  {% for comment in s[4] %}
+                    <li>{{ comment[2] }} {{ comment[3] }}</li>
+                  {% endfor %}
                 </ul>
                 <input type="text" class="comment">
                 <input type="hidden" name="status_id" id="status_id" value="{{ s[0] }}" />
