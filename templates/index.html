@@ -131,7 +131,6 @@ $(document).ready(function(){
   $(".post-status").live('click',function(){
     var status = $(".status").val();
     status = motion_txt+'#'+status;
-    alert(status);
     $.post('./post', {'status':status} ,function(data){
       var err = data.err;
       var msg = data.msg;
@@ -209,7 +208,6 @@ $(document).ready(function(){
         var tbody = $("tbody").html();
         $("tbody").html(tbody+more_html);
       }else{
-        alert("没有更多秘密了!");
         $(".show-more").html("没有更多秘密了!");
       }
     });
