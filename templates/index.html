@@ -73,8 +73,20 @@
             <tbody>
 
             {% for s in status %}
+              {% set motion, text = s[1].split('#', 1) %}
               <tr><td> 
-              Text: {{ s[1] }} Time: {{ s[3] }} 
+              {% if motion == 'undefined' %}
+                <button class="btn">心情</button>
+              {% elif motion == '高兴' %}
+                <button class="btn btn-danger">高兴</button>
+              {% elif motion == '寂寞' %}
+                <button class="btn btn-info">寂寞</button>
+              {% elif motion == '思念' %}
+                <button class="btn btn-success">思念</button>
+              {% else %}
+                <button class="btn btn-info">痛苦</button>
+              {% endif %}
+              Text: {{ text }} Time: {{ s[3] }} 
               <a class="show-comments" style="float:right">回应</a>
               <div class="comments">
                 <ul class="unstyled" style="margin-left:40px;">
@@ -121,7 +133,7 @@ $(document).ready(function(){
   var motion_txt;
   var page = 0;
   $(".comments").hide(); //隐藏所有评论
-
+  
   /* 心情 */
   $("a.motion").live('click',function(){
     motion_txt = $(this).text();
@@ -191,8 +203,17 @@ $(document).ready(function(){
                 "<li>" + comment.comment + comment.pub_time + "</li>";
             }
           }
+          var motion_and_txt = status.status.split('#', 1);
+          var motion_button = '';
+          if(motion_and_txt[0] == 'undefined'){
+            motion_button = '<button class="btn">心情</button>';
+          }else{
+            motion_button = '<button class="btn ' + motions[motion_and_txt[0]] +'">' + motion_and_txt[0] + '</button>';
+          }
           more_html = more_html +
-            "<tr><td>Text: "+status.status+"Time: "+status.pub_time+"<a class=\"show-comments\" style=\"float:right\">回应</a>"
+            "<tr><td>"
+            +motion_button
+            +"Text: "+ motion_and_txt[1] +"Time: "+status.pub_time+"<a class=\"show-comments\" style=\"float:right\">回应</a>"
             +"<div class=\"comments\" style=\"display:none\">"
             +"<ul class=\"unstyled\" style=\"margin-left:40px;\">"
             + comments_html
