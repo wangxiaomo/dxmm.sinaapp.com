@@ -48,15 +48,7 @@ def index():
         return redirect(auth_url)
     else:
         #TODO:不确定新浪OAuth2的access_key多会过期．
-        ret = []
-        status = list(show_status())
-        for s in status:
-            tmp = [] 
-            tmp.extend(s)
-            status_id = s[0]
-            comments = get_status_comments(status_id)
-            tmp.append(comments)
-            ret.append(tmp)
+        ret = show_status()
         return render_template('index.html', status=ret)
 
 @app.route("/callback")
@@ -118,6 +110,32 @@ def post_comment(status_id):
         msg = "*** Exception: %s" % ret 
     return jsonify(err=err,msg=msg)
 
+@app.route("/show")
+def show():
+    params = request.values 
+    page = int(params.get('page', 0))
+    ret = show_status(page)
+    # jsonify and return a json array.
+    items = []
+    for i in ret:
+        item = {}
+        item['status_id'] = i[0]
+        item['status'] = i[1]
+        item['uid'] = i[2]
+        item['pub_time'] = get_time(i[3])
+        comments = []
+        if i[4]:
+            for k in i[4]:
+                comment = {}
+                comment['post_id'] = k[0]
+                comment['uid'] = k[1]
+                comment['comment'] = k[2]
+                comment['pub_time'] = get_time(k[3])
+                comments.append(comment)
+        item['comments'] = comments
+        items.append(item)
+    return jsonify(data=items)
+
 @app.route("/logout")
 def logout():
     session['is_login'] = 0
@@ -156,10 +174,18 @@ def update_user_info(uid, screen_name, access_key, expires):
         return str(e)
 
 def show_status(page=0, count=20):
+    ret = []
     try:
         db = MySQL()
         sql = "SELECT * FROM status ORDER BY pub_time DESC LIMIT %d,%d" % (page*count, count)
-        ret = db.query(sql)
+        status = db.query(sql)
+        for s in status:
+            tmp = [] 
+            tmp.extend(s)
+            status_id = s[0]
+            comments = get_status_comments(status_id)
+            tmp.append(comments)
+            ret.append(tmp)
         return ret
     except Exception as e:
         return str(e)

@@ -85,13 +85,11 @@
                 <input type="text" class="comment">
                 <input type="hidden" name="status_id" id="status_id" value="{{ s[0] }}" />
                 <button class="post-comment">提交回应</button>
-                </div>
               </div>
               </td></tr>
             {% endfor %}
-
-            <tr><td><center>显示更多</center></td></tr>
             </tbody>
+            <tfoot><tr><td><center><a class="show-more">显示更多</a></center></td></tr></tfoot>
           </table>
         </div>
       </div>
@@ -125,12 +123,12 @@ $(document).ready(function(){
   $(".comments").hide(); //隐藏所有评论
 
   /* 心情 */
-  $("a.motion").click(function(){
+  $("a.motion").live('click',function(){
     motion_txt = $(this).text();
     $(".dropdown-toggle").removeClass().addClass('btn dropdown-toggle').addClass(motions[motion_txt]).html(motion_txt+" <span class=\"caret\"></span>");
   });
   /* 发布秘密 */
-  $(".post-status").click(function(){
+  $(".post-status").live('click',function(){
     var status = $(".status").val();
     status = motion_txt+'#'+status;
     alert(status);
@@ -149,11 +147,11 @@ $(document).ready(function(){
     });
   });
   /* 显示评论 */
-  $("a.show-comments").click(function(){
+  $("a.show-comments").live('click',function(){
     $(this).next().toggle();
   });
   /* 提交评论 */
-  $(".post-comment").click(function(){
+  $(".post-comment").live('click',function(){
     var comment_elem = $(this).prev().prev();
     var id = $(this).prev().attr('value');
     var url = './status/' + id;
@@ -167,6 +165,52 @@ $(document).ready(function(){
         ul_html = ul_html + "<li>"+comment_elem.val()+"</li>";
         ul_elem.html(ul_html);
         comment_elem.val('');
+      }
+    });
+  });
+  /* 显示更多 */
+  $(".show-more").live('click',function(){
+    if($(".show-more").html() == '没有更多秘密了!'){
+      alert("没有更多秘密了!");
+      return false;
+    }
+    // incr page counter
+    page = page+1;
+    var url = "./show?page="+page;
+    $.get(url, function(data){
+      var statuses = data.data;
+      if(statuses.length>0){
+        var more_html = '';
+
+        for(var i=0;i<statuses.length;i++){
+          var status = statuses[i];
+          var comments_html = '';
+          if(status.comments.length>0){
+            for(var j=0;j<status.comments.length;j++){
+              var comment = status.comments[j];
+              comments_html = comments_html + 
+                "<li>" + comment.comment + comment.pub_time + "</li>";
+            }
+          }
+          more_html = more_html +
+            "<tr><td>Text: "+status.status+"Time: "+status.pub_time+"<a class=\"show-comments\" style=\"float:right\">回应</a>"
+            +"<div class=\"comments\" style=\"display:none\">"
+            +"<ul class=\"unstyled\" style=\"margin-left:40px;\">"
+            + comments_html
+            +"</ul>"
+            +"<input type=\"text\" class=\"comment\">"
+            +"<input type=\"hidden\" name=\"status_id\" id=\"status_id\" value=\"" + status.status_id + "\" />"
+            +"<button class=\"post-comment\">提交回应</button>"
+            +"</div>"
+            +"</td></tr>";
+        }
+
+        // append to the tbody
+        var tbody = $("tbody").html();
+        $("tbody").html(tbody+more_html);
+      }else{
+        alert("没有更多秘密了!");
+        $(".show-more").html("没有更多秘密了!");
       }
     });
   });
