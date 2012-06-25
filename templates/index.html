@@ -129,6 +129,16 @@
 <script src="static/bootstrap/js/bootstrap.js"></script>
 <script type="text/javascript">
 $(document).ready(function(){
+  String.prototype.ltrim = function(){
+    return this.replace(/^\s*/,"");
+  };
+  String.prototype.rtrim = function(){
+    return this.replace(/\s*$/,"");
+  };
+  String.prototype.trim = function(){
+    return this.ltrim().rtrim();
+  };
+
   var motions = {'高兴':'btn-danger', '寂寞':'btn-info', '思念':'btn-success', '痛苦':'btn-inverse'};
   var motion_txt;
   var page = 0;
@@ -142,6 +152,10 @@ $(document).ready(function(){
   /* 发布秘密 */
   $(".post-status").live('click',function(){
     var status = $(".status").val();
+    if(status.trim() == ''){
+      alert("请输入内容!");
+      return;
+    }
     status = motion_txt+'#'+status;
     $.post('./post', {'status':status} ,function(data){
       var err = data.err;
