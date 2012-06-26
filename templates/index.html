@@ -179,9 +179,14 @@ $(document).ready(function(){
   /* 提交评论 */
   $(".post-comment").live('click',function(){
     var comment_elem = $(this).prev().prev();
+    var comment = comment_elem.val();
+    if(comment.trim() == ''){
+      alert("请输入内容！");
+      return;
+    }
     var id = $(this).prev().attr('value');
     var url = './status/' + id;
-    $.post(url, {'comment':comment_elem.val()}, function(data){
+    $.post(url, {'comment':comment}, function(data){
       if(data.err){
         alert(data.msg);
       }else{
