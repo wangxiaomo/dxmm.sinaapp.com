@@ -89,12 +89,12 @@
               Text: {{ text }} Time: {{ s[3] }} 
               <a class="show-comments" style="float:right">回应</a>
               <div class="comments">
-                <ul class="unstyled" style="margin-left:40px;">
+                <ul class="unstyled" style="margin-left:50px;">
                   {% for comment in s[4] %}
                     <li>{{ comment[2] }} {{ comment[3] }}</li>
                   {% endfor %}
                 </ul>
-                <input type="text" class="comment">
+                <input type="text" class="comment" style="margin-left:50px;">
                 <input type="hidden" name="status_id" id="status_id" value="{{ s[0] }}" />
                 <button class="post-comment">提交回应</button>
               </div>
