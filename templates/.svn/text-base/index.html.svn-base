@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>大学秘密</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="http://github.com/wangxiaomo/py-weibo-oauth2template">
+  <meta name="author" content="xiaomo(wxm4ever@gmail.com)">
+
+  <!-- Le styles -->
+  <link ref="shorcut icon" href="static/fav.ico" />
+  <link ref="bookmark" href="static/fav.ico" />
+  <link href="static/bootstrap/css/bootstrap.css" rel="stylesheet">
+  <link href="static/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+  <style type="text/css">
+  body {padding-top:60px; padding-bottom:40px;}
+  .comments li { color:grey; }
+  </style>
+</head>
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="navbar-inner">
+    <div class="container">
+      <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </a>
+      <a class="brand" href="#">大学秘密</a>
+      <div class="nav-collapse">
+        <ul class="nav">
+          <li class="active"><a href="#">Home</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+        <ul class="nav pull-right">
+          <li><a href="logout">Logout</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+<!-- some content -->
+  <div class="row">
+    <div class="span8">
+      <div class="container">
+        <div>
+          <h1>发布秘密</h1>
+           <div class="control-group">
+            <textarea class="input-xlarge status" id="textarea" rows="3" style="width:60%" placeholder="说点什么吧..."></textarea>
+            <div class="row">
+            <div class="span1 btn-group">
+              <button class="motion btn dropdown-toggle" data-toggle="dropdown">
+                 心情
+                 <span class="caret"></span>
+              </button>
+              <ul class="dropdown-menu">
+                <li><a class="motion" href="#">高兴</a></li>
+                <li><a class="motion" href="#">寂寞</a></li>
+                <li><a class="motion" href="#">思念</a></li>
+                <li><a class="motion" href="#">痛苦</a></li>
+              </ul>
+            </div>
+            <div class="span6"><button class="btn btn-inverse post-status" style="width:120px;float:right;margin-right:-44px;">我说</button></div>
+            </div>
+           </div>
+        </div>
+        <div>
+          <h1>显示秘密</h1>
+          <table class="show-status table table-bordered table-striped" style="width:61%">
+            <tbody>
+
+            {% for s in status %}
+              {% set motion, text = s[1].split('#', 1) %}
+              <tr><td> 
+              {% if motion == 'undefined' %}
+                <button class="btn">心情</button>
+              {% elif motion == '高兴' %}
+                <button class="btn btn-danger">高兴</button>
+              {% elif motion == '寂寞' %}
+                <button class="btn btn-info">寂寞</button>
+              {% elif motion == '思念' %}
+                <button class="btn btn-success">思念</button>
+              {% else %}
+                <button class="btn btn-info">痛苦</button>
+              {% endif %}
+              Text: {{ text }} Time: {{ s[3] }} 
+              <a class="show-comments" style="float:right">回应</a>
+              <div class="comments">
+                <ul class="unstyled" style="margin-left:50px;">
+                  {% for comment in s[4] %}
+                    <li>{{ comment[2] }} {{ comment[3] }}</li>
+                  {% endfor %}
+                </ul>
+                <input type="text" class="comment" style="margin-left:50px;">
+                <input type="hidden" name="status_id" id="status_id" value="{{ s[0] }}" />
+                <button class="post-comment">提交回应</button>
+              </div>
+              </td></tr>
+            {% endfor %}
+            </tbody>
+            <tfoot><tr><td><center><a class="show-more">显示更多</a></center></td></tr></tfoot>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="span4">
+      <h1>Features</h1>
+      <ul class="nav nav-tabs nav-stacked">
+        <li><a href="#">评论最多</a></li>
+        <li><a href="#">转发最多</a></li>
+        <li><a href="#">本周最佳</a></li>
+        <li><a href="#">本月最佳</a></li>
+        <li><a href="#">秘密分析</a></li>
+      </ul>
+    </div>
+  </div>
+
+<hr />
+<footer><center>
+&copy;SAE Python + Flask + xiaomo(wxm4ever@gmail.com). <a href="https://github.com/wangxiaomo/py-weibo-oauth2template/fork_select" target="_blank">Fork me</a>
+</center></footer>
+</div>
+
+
+<script src="static/bootstrap/js/jquery.js"></script>
+<script src="static/bootstrap/js/bootstrap.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+  String.prototype.ltrim = function(){
+    return this.replace(/^\s*/,"");
+  };
+  String.prototype.rtrim = function(){
+    return this.replace(/\s*$/,"");
+  };
+  String.prototype.trim = function(){
+    return this.ltrim().rtrim();
+  };
+
+  var motions = {'高兴':'btn-danger', '寂寞':'btn-info', '思念':'btn-success', '痛苦':'btn-inverse'};
+  var motion_txt;
+  var page = 0;
+  $(".comments").hide(); //隐藏所有评论
+  
+  /* 心情 */
+  $("a.motion").live('click',function(){
+    motion_txt = $(this).text();
+    $(".dropdown-toggle").removeClass().addClass('btn dropdown-toggle').addClass(motions[motion_txt]).html(motion_txt+" <span class=\"caret\"></span>");
+  });
+  /* 发布秘密 */
+  $(".post-status").live('click',function(){
+    var status = $(".status").val();
+    if(status.trim() == ''){
+      alert("请输入内容!");
+      return;
+    }
+    status = motion_txt+'#'+status;
+    $.post('./post', {'status':status} ,function(data){
+      var err = data.err;
+      var msg = data.msg;
+
+      if(err){
+        alert(msg);
+      }else{
+        //添加到 tbody 首
+        var tbody = $("tbody").html();
+        tbody = "<tr><td><center>有新秘密。点击刷新!</center></td></tr>" + tbody;
+        $("tbody").html(tbody);
+      }
+    });
+  });
+  /* 显示评论 */
+  $("a.show-comments").live('click',function(){
+    $(this).next().toggle();
+  });
+  /* 提交评论 */
+  $(".post-comment").live('click',function(){
+    var comment_elem = $(this).prev().prev();
+    var comment = comment_elem.val();
+    if(comment.trim() == ''){
+      alert("请输入内容！");
+      return;
+    }
+    var id = $(this).prev().attr('value');
+    var url = './status/' + id;
+    $.post(url, {'comment':comment}, function(data){
+      if(data.err){
+        alert(data.msg);
+      }else{
+        //评论成功.
+        var ul_elem = comment_elem.prev();
+        var ul_html = ul_elem.html();
+        ul_html = ul_html + "<li>"+comment_elem.val()+"</li>";
+        ul_elem.html(ul_html);
+        comment_elem.val('');
+      }
+    });
+  });
+  /* 显示更多 */
+  $(".show-more").live('click',function(){
+    if($(".show-more").html() == '没有更多秘密了!'){
+      alert("没有更多秘密了!");
+      return false;
+    }
+    // incr page counter
+    page = page+1;
+    var url = "./show?page="+page;
+    $.get(url, function(data){
+      var statuses = data.data;
+      if(statuses.length>0){
+        var more_html = '';
+
+        for(var i=0;i<statuses.length;i++){
+          var status = statuses[i];
+          var comments_html = '';
+          if(status.comments.length>0){
+            for(var j=0;j<status.comments.length;j++){
+              var comment = status.comments[j];
+              comments_html = comments_html + 
+                "<li>" + comment.comment + comment.pub_time + "</li>";
+            }
+          }
+          var motion_and_txt = status.status.split('#', 1);
+          var motion_button = '';
+          if(motion_and_txt[0] == 'undefined'){
+            motion_button = '<button class="btn">心情</button>';
+          }else{
+            motion_button = '<button class="btn ' + motions[motion_and_txt[0]] +'">' + motion_and_txt[0] + '</button>';
+          }
+          more_html = more_html +
+            "<tr><td>"
+            +motion_button
+            +"Text: "+ motion_and_txt[1] +"Time: "+status.pub_time+"<a class=\"show-comments\" style=\"float:right\">回应</a>"
+            +"<div class=\"comments\" style=\"display:none\">"
+            +"<ul class=\"unstyled\" style=\"margin-left:40px;\">"
+            + comments_html
+            +"</ul>"
+            +"<input type=\"text\" class=\"comment\">"
+            +"<input type=\"hidden\" name=\"status_id\" id=\"status_id\" value=\"" + status.status_id + "\" />"
+            +"<button class=\"post-comment\">提交回应</button>"
+            +"</div>"
+            +"</td></tr>";
+        }
+
+        // append to the tbody
+        var tbody = $("tbody").html();
+        $("tbody").html(tbody+more_html);
+      }else{
+        $(".show-more").html("没有更多秘密了!");
+      }
+    });
+  });
+});
+</script>
+</body>
+</html>

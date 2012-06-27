@@ -1,0 +1,13 @@
+---
+name: dxmm
+version: 1
+
+# APP CONFIG
+APP_KEY: "2862548415"
+APP_SECRET: "be73fd52ea7298ee983ae4ed61f7c96a"
+CALLBACK_URL: "http://dxmm.sinaapp.com/callback"
+
+# FLASK CONFIG
+DEBUG: 1
+SECRET_KEY: "http://github.com/wangxiaomo"
+...
