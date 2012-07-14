@@ -45,7 +45,9 @@ def index():
             raise Exception("Haven't Login")
     except:
         auth_url = client.get_authorize_url()
-        return redirect(auth_url)
+        # sina 审核不允许直接导向授权页面
+        # return redirect(auth_url)
+        return "<a href=\"%s\">OAuth2</a>" % auth_url
     else:
         #TODO:不确定新浪OAuth2的access_key多会过期．
         ret = show_status()
